@@ -1,6 +1,12 @@
 import { HPlatform, HMap } from "react-here-map";
 
-const Map = () => {
+interface MapProps {
+    coordinates : number[]
+}
+
+const Map = ({coordinates} : MapProps) => {
+    const lat = coordinates[0]
+    const lng = coordinates[1]
     return (
         <div>
             <HPlatform
@@ -16,8 +22,8 @@ const Map = () => {
                 <HMap
                     options={{
                     center: {
-                        lat: 52.5321472,
-                        lng: 13.3935785
+                        lat: lat,
+                        lng: lng
                     },
                     zoom:15,
                     mapType: 'raster.normal.mapnight'
