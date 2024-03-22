@@ -16,7 +16,9 @@ const Map = ({coordinates} : MapProps) => {
                     includePlaces: false,
                     includeUI: false,
                     interactive: true,
-                    version: 'v3/3.1'
+                    version: 'v3/3.1',
+                    useHTTPS: true,
+                    useCIT: true,
                 }}
                 >
                 <HMap
@@ -26,12 +28,13 @@ const Map = ({coordinates} : MapProps) => {
                         lng: lng
                     },
                     zoom:15,
-                    mapType: 'raster.normal.mapnight'
+                    mapType: 'raster.normal.mapnight',
                     }}
                     style={{
                     height: '100vh',
                     width: '100vw'
                     }}
+
                     useEvents
                 />
             </HPlatform>

@@ -1,9 +1,8 @@
 'use client'
 import Map from "@/components/map";
 import { Input } from "@/components/ui/input";
-import Image from "next/image";
-import { stringify } from "querystring";
-import { useEffect, useState, useLayoutEffect, AwaitedReactNode, JSXElementConstructor, ReactElement, ReactNode, ReactPortal } from "react";
+import { Search } from "lucide-react";
+import { useEffect, useLayoutEffect, useState, } from "react";
 
 export default function Home() {
   const [coordinates, setCoordinates] = useState<any>([])
@@ -12,23 +11,12 @@ export default function Home() {
   const [value, setValue] = useState<any>([])
   const [suggestData, setSuggestData] = useState<any>([]);
 
-  // const fetchMenu = async ({place} : any) => {
-  //   console.log(place)
-  //   const res = await fetch(`https://geocode.search.hereapi.com/v1/geocode?q=` + place+ `&apiKey=Y2rF_WsjbbUAFLC8WHMQGQIP-WkR_BYXZn8Jl44cJSc`);
-  //   const data = await res.json();
-  //   setSearchedCoordinates(data);
-  //   setFetching(true);
-  //   console.log(res, data, searchedCoordinates, fetching)
-  // };
-
-  const getGeoCode = () => { }
-
   useLayoutEffect(() => {
     const options = {
       enableHighAccuracy: true,
       maximumAge: 0,
     };
-
+  
     function success(pos: { coords: any; }) {
       const crd = pos.coords;
 
@@ -40,16 +28,16 @@ export default function Home() {
     }
 
     navigator.geolocation.getCurrentPosition(success, error, options);
-
-  }, [setCoordinates])
-
+  
+  })
+  
   useEffect(() => {
     document.getElementById('input')?.addEventListener('keydown', async (e) => {
       if (e.key === 'Enter') {
         const place = (document.getElementById('input') as HTMLInputElement)?.value.toString();
         console.log(place)
 
-        const res = await fetch(`https://geocode.search.hereapi.com/v1/geocode?q=` + place + `&apiKey=Y2rF_WsjbbUAFLC8WHMQGQIP-WkR_BYXZn8Jl44cJSc`);
+        const res = await fetch(`https://geocode.search.hereapi.com/v1/geocode?q=` + place + `&apiKey=3gSXkune0p-YKqCe8cho9flyOW5QeBe3Wj-4CJTqfrQ`);
         const data = await res.json();
         const lat = await data.items[0].position.lat;
         const lng = await data.items[0].position.lng;
@@ -67,11 +55,10 @@ export default function Home() {
   useEffect(() => {
     const getSuggestions = (async () => {
       console.log("inside getSuggestions");
-      const res = await fetch(`https://autosuggest.search.hereapi.com/v1/autosuggest?at=`+ coordinates[0] + `,` + coordinates[1] + `&limit=5&lang=en&q=`+ value + `&apiKey=Y2rF_WsjbbUAFLC8WHMQGQIP-WkR_BYXZn8Jl44cJSc`)
+      const res = await fetch(`https://autosuggest.search.hereapi.com/v1/autosuggest?at=`+ coordinates[0] + `,` + coordinates[1] + `&limit=5&lang=en&q=`+ value + `&apiKey=3gSXkune0p-YKqCe8cho9flyOW5QeBe3Wj-4CJTqfrQ`)
       const data = await res.json();
-      // console.log(<data className="items"></data>)
-      // setSuggestData(data.address?.label);
-      setSuggestData(data.items)
+      const filteredData = data.items.filter((item: any) => item.resultType === "administrativeArea" || item.resultType === 'locality');
+      setSuggestData(filteredData)
       console.log(suggestData)
     }
     );
@@ -84,10 +71,27 @@ export default function Home() {
 
   return (
     <main className="relative max-w-screen text-white">
-      <Input id="input" className="w-[30vw] rounded-full bg-[#5E5E5E]/75 border-none text-xl font-bold backdrop-blur-md absolute z-[99] top-5 left-5" onChange={e => setValue(e.target.value)} />
-      {suggestData?.map((data:any,id: any)=>{<div key={id} className="absolute z-[99] top-28 left-5">Hello</div>})}
-      {/* <div className="absolute z-[99] top-20 left-5">{suggestData[0].title}</div>
-      <div className="absolute z-[99] top-28 left-5">{suggestData[0].title}</div> */}
+      <div className="w-[30vw] rounded-full bg-[#434343]/75 border-none text-xl font-bold backdrop-blur absolute z-[99] top-5 left-5 overflow-hidden flex gap-5 items-center pl-2 pr-5">
+        <Input id="input" className="bg-transparent border-none rounded-full text-xl" onChange={e => setValue(e.target.value)} />
+        <Search />
+      </div>
+      {suggestData.length !==0 && (
+        <div className="absolute top-20 z-[99] flex flex-col gap-2 left-5 bg-[#434343]/75 backdrop-blur w-[30vw] rounded-xl p-5">
+          {suggestData.map((data:any , id : number) => {
+            return (
+              <div role="button">
+                <h1 className="text-xl font-medium">
+                  {data.title}
+                </h1>
+                <p>
+                  {data.resultType === "administrativeArea" && data.administrativeAreaType}
+                  {data.resultType === "locality" && data.localityType}
+                </p>
+              </div>
+            )
+          })}
+        </div>
+      )}
       <Map coordinates={coordinates} />
     </main>
   );
