@@ -5,7 +5,7 @@ import { Search } from "lucide-react";
 import { useEffect, useLayoutEffect, useState, } from "react";
 import { Roboto } from "next/font/google";
 
-const mainFont = Roboto({subsets: ['latin'], weight: ['400']});
+const mainFont = Roboto({ subsets: ['latin'], weight: ['400'] });
 
 export default function Home() {
   const [coordinates, setCoordinates] = useState<any>([])
@@ -13,14 +13,14 @@ export default function Home() {
   const [Data, setData] = useState<any>([])
   const [value, setValue] = useState<any>([])
   const [suggestData, setSuggestData] = useState<any>([]);
-  const [markers, setMarkers]= useState<any>([])
+  const [markers, setMarkers] = useState<any>([])
 
   useLayoutEffect(() => {
     const options = {
       enableHighAccuracy: true,
       maximumAge: 0,
     };
-  
+
     function success(pos: { coords: any; }) {
       const crd = pos.coords;
 
@@ -32,9 +32,9 @@ export default function Home() {
     }
 
     navigator.geolocation.getCurrentPosition(success, error, options);
-  
+
   }, [setCoordinates])
-  
+
   useEffect(() => {
     document.getElementById('input')?.addEventListener('keydown', async (e) => {
       if (e.key === 'Enter') {
@@ -59,7 +59,7 @@ export default function Home() {
   useEffect(() => {
     const getSuggestions = (async () => {
       console.log("inside getSuggestions");
-      const res = await fetch(`https://autosuggest.search.hereapi.com/v1/autosuggest?at=`+ coordinates[0] + `,` + coordinates[1] + `&limit=5&lang=en&q=`+ value + `&apiKey=3gSXkune0p-YKqCe8cho9flyOW5QeBe3Wj-4CJTqfrQ`)
+      const res = await fetch(`https://autosuggest.search.hereapi.com/v1/autosuggest?at=` + coordinates[0] + `,` + coordinates[1] + `&limit=5&lang=en&q=` + value + `&apiKey=3gSXkune0p-YKqCe8cho9flyOW5QeBe3Wj-4CJTqfrQ`)
       const data = await res.json();
       const filteredData = data.items.filter((item: any) => item.resultType === "administrativeArea" || item.resultType === 'locality');
       setSuggestData(filteredData)
@@ -73,31 +73,38 @@ export default function Home() {
 
   }, [value])
 
-  useEffect(() => {
-    const getMarkers = (async () => {
-        console.log("inside getSuggestions");
-        const res = await fetch(`https://discover.search.hereapi.com/v1/discover?in=cirlce:`+ coordinates[0] + `,` + coordinates[1] + `r=20000&q=historical+monuments&apiKey=3gSXkune0p-YKqCe8cho9flyOW5QeBe3Wj-4CJTqfrQ`)
-        const data = await res.json();
-        setMarkers(data)
-        console.log(Data)
-      }
-    );
-    if(coordinates[0]!==undefined && coordinates[1]!==undefined)
-    getMarkers();
-  
-}, [setMarkers])
+  //   useEffect(() => {
+  //     const getMarkers = (async () => {
+  //         console.log("inside getSuggestions");
+  //         const res = await fetch(`https://discover.search.hereapi.com/v1/discover?in=cirlce:`+ coordinates[0] + `,` + coordinates[1] + `r=20000&q=historical+monuments&apiKey=3gSXkune0p-YKqCe8cho9flyOW5QeBe3Wj-4CJTqfrQ`)
+  //         const data = await res.json();
+  //         setMarkers(data)
+  //         console.log(Data)
+  //       }
+  //     );
+  //     if(coordinates[0]!==undefined && coordinates[1]!==undefined)
+  //     getMarkers();
+
+  // }, [setMarkers])
+
+  function changeTheMap(data: any) {
+    console.log(data)
+    setSuggestData([]);
+    setValue([])
+    setCoordinates([data.position.lat,data.position.lng]);
+  }
 
   return (
     <main className={mainFont.className + " relative max-w-screen text-white"}>
       <div className="w-[30vw] rounded-full bg-[#434343]/75 border-none text-xl font-semibold backdrop-blur absolute z-[99] top-5 left-5 overflow-hidden flex gap-5 items-center pl-2 pr-5">
-        <Input id="input" className="bg-transparent border-none rounded-full text-xl" onChange={e => setValue(e.target.value)} />
+        <Input id="input" className="bg-transparent border-none rounded-full text-xl" onChange={e => setValue(e.target.value)} value={value} />
         <Search />
       </div>
-      {suggestData.length !==0 && (
+      {suggestData.length !== 0 && (
         <div className="absolute top-20 z-[99] flex flex-col gap-2 left-5 bg-[#434343]/75 backdrop-blur w-[30vw] rounded-xl p-5">
-          {suggestData.map((data:any , id : number) => {
+          {suggestData.map((data: any, id: number) => {
             return (
-              <div key={id} role="button">
+              <div key={id} role="button" onClick={e => changeTheMap(data)}>
                 <h1 className="text-xl font-medium">
                   {data.title}
                 </h1>
