@@ -41,7 +41,7 @@ export default function Home() {
       if (e.key === 'Enter') {
         const place = (document.getElementById('input') as HTMLInputElement)?.value.toString();
 
-        const res = await fetch(`https://geocode.search.hereapi.com/v1/geocode?q=` + place + `&apiKey=I8lpkuRyJfxK5An9NzPrFalvL_9Nyjh5Qx76yN9xRQs`);
+        const res = await fetch(`https://geocode.search.hereapi.com/v1/geocode?q=` + place + `&apiKey=5VMF81RZmt3xzNGQFjH5oJ7UWGkm8BjqNIrPmW97Ntw`);
         const data = await res.json();
         const lat = await data.items[0].position.lat;
         const lng = await data.items[0].position.lng;
@@ -57,7 +57,7 @@ export default function Home() {
 
   useEffect(() => {
     const getSuggestions = (async () => {
-      const res = await fetch(`https://autosuggest.search.hereapi.com/v1/autosuggest?at=` + coordinates[0] + `,` + coordinates[1] + `&limit=5&lang=en&q=` + value + `&apiKey=I8lpkuRyJfxK5An9NzPrFalvL_9Nyjh5Qx76yN9xRQs`)
+      const res = await fetch(`https://autosuggest.search.hereapi.com/v1/autosuggest?at=` + coordinates[0] + `,` + coordinates[1] + `&limit=5&lang=en&q=` + value + `&apiKey=5VMF81RZmt3xzNGQFjH5oJ7UWGkm8BjqNIrPmW97Ntw`)
       const data = await res.json();
       const filteredData = data.items.filter((item: any) => item.resultType === "administrativeArea" || item.resultType === 'locality');
       setSuggestData(filteredData)
