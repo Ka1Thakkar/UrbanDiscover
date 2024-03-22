@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { HPlatform, HMap } from "react-here-map";
 
 interface MapProps {
@@ -7,6 +8,7 @@ interface MapProps {
 const Map = ({coordinates} : MapProps) => {
     const lat = coordinates[0]
     const lng = coordinates[1]
+    console.log(lat, lng)
     return (
         <div>
             <HPlatform
