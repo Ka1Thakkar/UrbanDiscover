@@ -2,14 +2,15 @@
 import { Input } from "@/components/ui/input";
 import { Layers, Search } from "lucide-react";
 import { useEffect, useLayoutEffect, useState, } from "react";
-import { DM_Sans } from "next/font/google";
+import { DM_Sans, Roboto, Roboto_Condensed } from "next/font/google";
 import dynamic from "next/dynamic";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
 const Map = dynamic(() => import('@/components/map'), { ssr: false });
 
-const mainFont = DM_Sans({ subsets: ['latin'], weight: ['400'] });
+const headingFont = Roboto_Condensed({ subsets: ['latin'], weight: 'variable' });
+const contentFont = Roboto({ subsets: ['latin'], weight: ['400','500','700'] });
 
 export default function Home() {
   const [coordinates, setCoordinates] = useState<any>([])
@@ -51,6 +52,7 @@ export default function Home() {
         const lng = await data.items[0].position.lng;
         setFetched(true)
         setData(data)
+        setSuggestData([])
       }
     })
     if (fetched) {
@@ -88,63 +90,65 @@ export default function Home() {
   }
 
   return (
-    <main className={mainFont.className + " relative max-w-screen text-neutral-900"}>
-      <div className="absolute z-[99999] top-5 left-5 flex gap-5 items-center">
-        <div className={cn("w-[30vw] rounded-full border-none text-xl font-semibold backdrop-blur overflow-hidden flex gap-5 items-center pl-2 pr-5", layerMode === 'dark' ? 'bg-neutral-300/80 text-neutral-900' : 'bg-neutral-700/80 text-neutral-100')}>
-          <Input id="input" className={cn("bg-transparent border-none rounded-full text-xl")} onChange={e => setValue(e.target.value)} value={value} />
-          <Search className={cn(layerMode === 'dark' ? 'text-neutral-900' : 'text-neutral-100')} />
+    <main className={headingFont.className + " relative max-w-screen text-neutral-900"}>
+      <div className="absolute z-[99999] p-5 w-screen lg:w-fit">
+        <div className="flex gap-5 items-center pb-5">
+          <div className={cn("lg:w-[30vw] w-max rounded-full border-none text-xl font-semibold backdrop-blur overflow-hidden flex gap-5 items-center pl-2 pr-5", layerMode === 'dark' ? 'bg-neutral-300/80 text-neutral-900' : 'bg-neutral-700/80 text-neutral-100')}>
+            <Input id="input" className={cn("bg-transparent border-none rounded-full text-xl")} onChange={e => setValue(e.target.value)} value={value} />
+            <Search className={cn(layerMode === 'dark' ? 'text-neutral-900' : 'text-neutral-100')} />
+          </div>
+          <div className={cn("rounded-full text-xl font-medium backdrop-blur p-2", layerMode === 'dark' ? 'bg-neutral-300/80' : 'bg-neutral-700/80')}>
+            <DropdownMenu>
+              <DropdownMenuTrigger className={cn("z-[99999] border-none outline-none flex items-center", layerMode === 'dark' ? 'text-neutral-900' : 'text-neutral-100')}>
+                <Layers />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className={cn("z-[99999] border-none outline-none mt-5 backdrop-blur", layerMode === 'dark' ? 'text-neutral-900 bg-neutral-300/80' : 'text-neutral-100 bg-neutral-700/80', contentFont.className)}>
+                <DropdownMenuLabel>Choose the layer you prefer:</DropdownMenuLabel>
+                <DropdownMenuSeparator className={cn(layerMode === 'dark' ? "bg-neutral-800" : "bg-neutral-200")} />
+                <DropdownMenuItem>
+                  <button onClick={() => onLayerClick('OpenStreetMap', 'light')}>
+                    OpenStreetMap Light
+                  </button>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <button onClick={() => onLayerClick('OpenStreetMap', 'dark')}>
+                    OpenStreetMap Dark
+                  </button>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <button onClick={() => onLayerClick('HERE', 'light')}>
+                    HERE Maps Light
+                  </button>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <button onClick={() => onLayerClick('HERE', 'dark')}>
+                    HERE Maps Dark
+                  </button>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
-        <div className={cn("rounded-full text-xl font-medium backdrop-blur p-2", layerMode === 'dark' ? 'bg-neutral-300/80' : 'bg-neutral-700/80')}>
-          <DropdownMenu>
-            <DropdownMenuTrigger className={cn("z-[99999] border-none outline-none flex items-center", layerMode === 'dark' ? 'text-neutral-900' : 'text-neutral-100')}>
-              <Layers />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className={cn("z-[99999] border-none outline-none mt-5 backdrop-blur", layerMode === 'dark' ? 'text-neutral-900 bg-neutral-300/80' : 'text-neutral-100 bg-neutral-700/80')}>
-              <DropdownMenuLabel>Choose the layer you prefer:</DropdownMenuLabel>
-              <DropdownMenuSeparator className={cn(layerMode === 'dark' ? "bg-neutral-800" : "bg-neutral-200")} />
-              <DropdownMenuItem>
-                <button onClick={() => onLayerClick('OpenStreetMap', 'light')}>
-                  OpenStreetMap Light
-                </button>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <button onClick={() => onLayerClick('OpenStreetMap', 'dark')}>
-                  OpenStreetMap Dark
-                </button>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <button onClick={() => onLayerClick('HERE', 'light')}>
-                  HERE Maps Light
-                </button>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <button onClick={() => onLayerClick('HERE', 'dark')}>
-                  HERE Maps Dark
-                </button>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <div className={cn(suggestData.length !== 0  ? "z-[99999] flex flex-col gap-2 backdrop-blur w-full lg:w-[30vw] rounded-xl p-5" : 'hidden', layerMode === 'dark' ? 'bg-neutral-300/80 text-neutral-900' : 'bg-neutral-700/80 text-neutral-100')}>
+          {suggestData.map((data: any, id: number) => {
+            return (
+              <div key={id} role="button" onClick={e => changeTheMap(data)}>
+                <h1 className={cn(headingFont.className,"text-xl font-medium")}>
+                  {data.title}
+                </h1>
+                <p className={cn(contentFont.className, "flex gap-2")}>
+                  <span>
+                    {data.resultType === "administrativeArea" && data.administrativeAreaType}
+                    {data.resultType === "locality" && data.localityType}
+                  </span>
+                  <span>
+                    ({data.position.lat}, {data.position.lng})
+                  </span>
+                </p>
+              </div>
+            )
+          })}
         </div>
-      </div>
-      <div className={cn(suggestData.length !== 0  ? "absolute top-20 z-[99999] flex flex-col gap-2 left-5 backdrop-blur w-[30vw] rounded-xl p-5" : 'hidden', layerMode === 'dark' ? 'bg-neutral-300/80 text-neutral-900' : 'bg-neutral-700/80 text-neutral-100')}>
-        {suggestData.map((data: any, id: number) => {
-          return (
-            <div key={id} role="button" onClick={e => changeTheMap(data)}>
-              <h1 className="text-xl font-medium">
-                {data.title}
-              </h1>
-              <p className="flex gap-2">
-                <span>
-                  {data.resultType === "administrativeArea" && data.administrativeAreaType}
-                  {data.resultType === "locality" && data.localityType}
-                </span>
-                <span>
-                  ({data.position.lat}, {data.position.lng})
-                </span>
-              </p>
-            </div>
-          )
-        })}
       </div>
       <Map coordinates={coordinates} layer={layerType} mode={layerMode}/>
     </main>

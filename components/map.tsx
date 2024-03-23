@@ -4,11 +4,12 @@ import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 're
 import markerIcon from '@/public/marker.svg'
 import L from 'leaflet';
 import { CircleX } from "lucide-react";
-import { DM_Serif_Display, DM_Sans } from "next/font/google";
+import { DM_Serif_Display, DM_Sans, Roboto_Condensed, Roboto } from "next/font/google";
 import { cn } from "@/lib/utils";
+import { AnimatePresence, motion } from "framer";
 
-const headingFont = DM_Serif_Display({ subsets: ['latin'], weight: ['400'] });
-const contentFont = DM_Sans({ subsets: ['latin'], weight: ['400'] });
+const headingFont = Roboto_Condensed({ subsets: ['latin'], weight: 'variable' });
+const contentFont = Roboto({ subsets: ['latin'], weight: ['400','500','700'] });
 
 const myIcon = L.divIcon({
     html: `<img src=${markerIcon.src} alt="marker" />`,
@@ -52,7 +53,9 @@ const Map = ({ coordinates, layer, mode }: MapProps) => {
         }, [coordinates])
         return (
             <>
-            {modal && (<Modal markerData={markerData} state={modal} stateFunction={setModal} mode={mode} />)}
+            <AnimatePresence>
+                {modal && (<Modal markerData={markerData} state={modal} stateFunction={setModal} mode={mode} />)}
+            </AnimatePresence>
             <MapContainer
                 id="Map"
                 center={[28.679079, 77.069710]}
@@ -88,10 +91,10 @@ const Map = ({ coordinates, layer, mode }: MapProps) => {
                         <Marker icon={myIcon} key={index} position={[marker.position.lat, marker.position.lng]}>
                             <Popup className="">
                                 <div className="py-2 px-5">
-                                    <h1 className=" text-base font-semibold">
+                                    <h1 className={cn(headingFont.className, " text-base font-semibold")}>
                                         {marker.title}
                                     </h1>
-                                    <button className=" text-blue-950 pt-2" onClick={() => {setModal(true); setMarkerData(marker)}}>
+                                    <button className={cn(contentFont.className, " text-blue-950 pt-2")} onClick={() => {setModal(true); setMarkerData(marker)}}>
                                         Read More...
                                     </button>
                                 </div>
@@ -128,23 +131,38 @@ interface ModalProps {
 
 const Modal = ({markerData, state, stateFunction, mode} : ModalProps) => {
     return (
-        <div className={cn("absolute z-[99999] w-screen h-screen top-0 left-0 flex items-center justify-center", contentFont.className)}>
-            <div className={cn("w-[75vw] h-[75vh] backdrop-blur-xl p-5 rounded-xl", mode === 'dark' ? 'bg-neutral-300/80 text-neutral-900' : 'bg-neutral-700/80 text-neutral-100')}>
-                <div role="button" onClick={() => stateFunction(!state)}>
+        <motion.div
+            initial={{opacity:0}}
+            animate={{opacity:1}}
+            transition={{duration:0.2,ease:"easeInOut"}}
+            exit={{opacity:0}}
+            className={cn("absolute z-[9999] h-screen top-0 left-0 flex items-end lg:items-end p-5 w-[100vw] lg:w-fit", contentFont.className)}
+        >
+            <motion.div 
+                initial={{opacity:0, y:500}}
+                animate ={{opacity:1, y:0}}
+                transition={{duration:0.2,ease:"easeInOut"}}
+                exit={{opacity:0, y:500}}
+                className={cn("lg:w-[30vw] w-full h-[50vh] lg:h-[60vh] backdrop-blur-xl p-10 pt-20 rounded-2xl z-[99999] relative overflow-y-auto", mode === 'dark' ? 'bg-neutral-300/80 text-neutral-900' : 'bg-neutral-700/80 text-neutral-100')}
+            >
+                <div role="button" className="fixed top-5 left-5" onClick={() => stateFunction(!state)}>
                     <CircleX size={30} />
                 </div>
-                <div className="pt-10">
-                    <p className={cn("text-5xl uppercase", headingFont.className)}>
+                <div className="">
+                    <p className={cn("text-5xl font-semibold", headingFont.className)}>
                         {markerData.title}
                     </p>
-                    <p className="pt-2 font-light">
+                    <p className="pt-2 text-sm">
                         Address : {markerData.address.label} ({markerData.position.lat}, {markerData.position.lng})
                     </p>
-                    <p className="font-light">
+                    <p className="text-sm">
                         Category : {markerData.categories[0].name}
                     </p>
+                    <p className="text-lg pt-10">
+                        Madame Tussauds India is a wax museum and tourist attraction It is the twenty-second location for the Tussauds, which was set up by French sculptor Marie Tussaud. Madame Tussauds is owned and operated by Merlin Entertainments. Now it has been shifted to Noida in July 2022.
+                    </p>
                 </div>
-            </div>
-        </div>
+            </motion.div>
+        </motion.div>
     )
 }
