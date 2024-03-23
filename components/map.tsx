@@ -8,6 +8,7 @@ import { DM_Serif_Display, DM_Sans } from "next/font/google";
 import { cn } from "@/lib/utils";
 
 const headingFont = DM_Serif_Display({ subsets: ['latin'], weight: ['400'] });
+const contentFont = DM_Sans({ subsets: ['latin'], weight: ['400'] });
 
 const myIcon = L.divIcon({
     html: `<img src=${markerIcon.src} alt="marker" />`,
@@ -51,7 +52,7 @@ const Map = ({ coordinates, layer, mode }: MapProps) => {
         }, [coordinates])
         return (
             <>
-            {modal && (<Modal markerData={markerData} state={modal} stateFunction={setModal} />)}
+            {modal && (<Modal markerData={markerData} state={modal} stateFunction={setModal} mode={mode} />)}
             <MapContainer
                 id="Map"
                 center={[28.679079, 77.069710]}
@@ -121,20 +122,27 @@ const RecenterAutomatically = ({lat,lng} : any) => {
 interface ModalProps {
     markerData : any,
     state : boolean,
-    stateFunction : any
+    stateFunction : any,
+    mode : string
 }
 
-const Modal = ({markerData, state, stateFunction} : ModalProps) => {
+const Modal = ({markerData, state, stateFunction, mode} : ModalProps) => {
     return (
-        <div className={cn("absolute z-[99999] w-screen h-screen top-0 left-0 flex items-center justify-center", headingFont.className)}>
-            <div className="w-[75vw] h-[60vh] bg-gray-300 backdrop-blur p-5 rounded-xl">
+        <div className={cn("absolute z-[99999] w-screen h-screen top-0 left-0 flex items-center justify-center", contentFont.className)}>
+            <div className={cn("w-[75vw] h-[75vh] backdrop-blur-xl p-5 rounded-xl", mode === 'dark' ? 'bg-neutral-300/80 text-neutral-900' : 'bg-neutral-700/80 text-neutral-100')}>
                 <div role="button" onClick={() => stateFunction(!state)}>
-                    <CircleX />
+                    <CircleX size={30} />
                 </div>
                 <div className="pt-10">
-                    <h1 className="text-5xl uppercase">
+                    <p className={cn("text-5xl uppercase", headingFont.className)}>
                         {markerData.title}
-                    </h1>
+                    </p>
+                    <p className="pt-2 font-light">
+                        Address : {markerData.address.label} ({markerData.position.lat}, {markerData.position.lng})
+                    </p>
+                    <p className="font-light">
+                        Category : {markerData.categories[0].name}
+                    </p>
                 </div>
             </div>
         </div>

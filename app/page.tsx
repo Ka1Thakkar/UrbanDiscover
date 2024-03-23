@@ -1,6 +1,6 @@
 'use client'
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Layers, Search } from "lucide-react";
 import { useEffect, useLayoutEffect, useState, } from "react";
 import { DM_Sans } from "next/font/google";
 import dynamic from "next/dynamic";
@@ -88,18 +88,20 @@ export default function Home() {
   }
 
   return (
-    <main className={mainFont.className + " relative max-w-screen text-gray-900"}>
-      <div className="absolute z-[9999] top-5 left-5 flex gap-5 items-center">
-        <div className="w-[30vw] rounded-full bg-gray-300/60 border-none text-xl font-semibold backdrop-blur overflow-hidden flex gap-5 items-center pl-2 pr-5">
-          <Input id="input" className="bg-transparent border-none rounded-full text-xl" onChange={e => setValue(e.target.value)} value={value} />
-          <Search />
+    <main className={mainFont.className + " relative max-w-screen text-neutral-900"}>
+      <div className="absolute z-[99999] top-5 left-5 flex gap-5 items-center">
+        <div className={cn("w-[30vw] rounded-full border-none text-xl font-semibold backdrop-blur overflow-hidden flex gap-5 items-center pl-2 pr-5", layerMode === 'dark' ? 'bg-neutral-300/80 text-neutral-900' : 'bg-neutral-700/80 text-neutral-100')}>
+          <Input id="input" className={cn("bg-transparent border-none rounded-full text-xl")} onChange={e => setValue(e.target.value)} value={value} />
+          <Search className={cn(layerMode === 'dark' ? 'text-neutral-900' : 'text-neutral-100')} />
         </div>
-        <div className="rounded-full bg-gray-300/60 text-xl font-semibold backdrop-blur px-5 py-2">
+        <div className={cn("rounded-full text-xl font-medium backdrop-blur p-2", layerMode === 'dark' ? 'bg-neutral-300/80' : 'bg-neutral-700/80')}>
           <DropdownMenu>
-            <DropdownMenuTrigger className="z-[9999] border-none outline-none">Layers</DropdownMenuTrigger>
-            <DropdownMenuContent className="z-[9999] bg-gray-300/60 backdrop-blur mt-5 ml-24">
+            <DropdownMenuTrigger className={cn("z-[99999] border-none outline-none flex items-center", layerMode === 'dark' ? 'text-neutral-900' : 'text-neutral-100')}>
+              <Layers />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className={cn("z-[99999] border-none outline-none mt-5 backdrop-blur", layerMode === 'dark' ? 'text-neutral-900 bg-neutral-300/80' : 'text-neutral-100 bg-neutral-700/80')}>
               <DropdownMenuLabel>Choose the layer you prefer:</DropdownMenuLabel>
-              <DropdownMenuSeparator />
+              <DropdownMenuSeparator className={cn(layerMode === 'dark' ? "bg-neutral-800" : "bg-neutral-200")} />
               <DropdownMenuItem>
                 <button onClick={() => onLayerClick('OpenStreetMap', 'light')}>
                   OpenStreetMap Light
@@ -124,7 +126,7 @@ export default function Home() {
           </DropdownMenu>
         </div>
       </div>
-      <div className={cn(suggestData.length !== 0  ? "absolute top-20 z-[99999] flex flex-col gap-2 left-5 bg-gray-300/60 backdrop-blur w-[30vw] rounded-xl p-5" : 'hidden')}>
+      <div className={cn(suggestData.length !== 0  ? "absolute top-20 z-[99999] flex flex-col gap-2 left-5 backdrop-blur w-[30vw] rounded-xl p-5" : 'hidden', layerMode === 'dark' ? 'bg-neutral-300/80 text-neutral-900' : 'bg-neutral-700/80 text-neutral-100')}>
         {suggestData.map((data: any, id: number) => {
           return (
             <div key={id} role="button" onClick={e => changeTheMap(data)}>
