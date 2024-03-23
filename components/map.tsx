@@ -32,7 +32,9 @@ const Map = ({ coordinates, layer, mode }: MapProps) => {
         const [Data, setData] = useState<any>([])
         const [modal, setModal] = useState(false)
         const [markerData, setMarkerData] = useState<any>([])
+        const [locationData, setLocationData] = useState<any>([])
 
+        
         useEffect(() => {
             const getMarkers = (async () => {
                 console.log("inside getSuggestions");
@@ -44,12 +46,12 @@ const Map = ({ coordinates, layer, mode }: MapProps) => {
                 const dataLandmarkAttractions = await resLandmarkAttractions.json();
                 const data = dataHistoricalMonuments.items.concat(dataTouristAttractions.items, dataLandmarkAttractions.items)
                 setMarkers(data)
-              }
+            }
             );
             if(coordinates[0]!==undefined && coordinates[1]!==undefined){
                 getMarkers();
             }
-      
+            
         }, [coordinates])
         return (
             <>
@@ -64,33 +66,33 @@ const Map = ({ coordinates, layer, mode }: MapProps) => {
                 zoomControl={false}
                 zoomAnimation
                 className="w-[100vw] h-[100vh]"
-            >
+                >
                 {layer === 'HERE' && mode === 'light' &&(<TileLayer
                     url="https://2.base.maps.ls.hereapi.com/maptile/2.1/maptile/newest/normal.day/{z}/{x}/{y}/512/png8?apiKey=I8lpkuRyJfxK5An9NzPrFalvL_9Nyjh5Qx76yN9xRQs&ppi=320"
                     // attribution="&copy; <a>HERE Maps</a> contributors" 
                     className=" grayscale"
-                />)}
+                    />)}
                 {layer === 'HERE' && mode === 'dark' &&(<TileLayer
                     url="https://2.base.maps.ls.hereapi.com/maptile/2.1/maptile/newest/reduced.night/{z}/{x}/{y}/512/png8?apiKey=I8lpkuRyJfxK5An9NzPrFalvL_9Nyjh5Qx76yN9xRQs&ppi=320"
                     // attribution="&copy; <a>HERE Maps</a> contributors" 
                     className=" grayscale contrast-200"
-                />)}
+                    />)}
                 {layer === 'OpenStreetMap' && mode === 'light' &&(<TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     // attribution="&copy; <a>OpenStreetMap</a> contributors" 
                     className=" grayscale"
-                />)}
+                    />)}
                 {layer === 'OpenStreetMap' && mode === 'dark' &&(<TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     // attribution="&copy; <a>OpenStreetMap</a> contributors" 
                     className=" grayscale invert"
-                />)}
+                    />)}
                 <RecenterAutomatically lat={lat} lng={lng} />
                 {markers?.map((marker: any, index : any) => {
                     return (
                         <Marker icon={myIcon} key={index} position={[marker.position.lat, marker.position.lng]}>
                             <Popup className="">
-                                <div className="py-2 px-5">
+                                <div className="">
                                     <h1 className={cn(headingFont.className, " text-base font-semibold")}>
                                         {marker.title}
                                     </h1>
@@ -111,8 +113,8 @@ export default Map;
 
 const RecenterAutomatically = ({lat,lng} : any) => {
     const map = useMap();
-     useEffect(() => {
-       if (lat !== undefined )
+    useEffect(() => {
+        if (lat !== undefined )
         {
             map.setView([lat, lng]);
         } else {
@@ -130,34 +132,51 @@ interface ModalProps {
 }
 
 const Modal = ({markerData, state, stateFunction, mode} : ModalProps) => {
+    const getMessage = async (marker : any) => {
+        if (marker.title !== undefined) {const res = await fetch('/api/claude-ai', {
+            method : 'POST',
+            headers :{
+                'ContentType' : 'application/json'
+            },
+            body : JSON.stringify({
+                someData : true,
+                text : marker.title
+            })
+        })}
+    }
+
+    useEffect(() => {
+        getMessage(markerData)
+    })
+
     return (
         <motion.div
             initial={{opacity:0}}
             animate={{opacity:1}}
             transition={{duration:0.2,ease:"easeInOut"}}
             exit={{opacity:0}}
-            className={cn("absolute z-[9999] h-screen top-0 left-0 flex items-end lg:items-end p-5 w-[100vw] lg:w-fit", contentFont.className)}
+            className={cn("absolute z-[9999] h-fit lg:h-screen lg:top-0 bottom-0 left-0 flex items-end lg:items-end p-5 w-[100vw] lg:w-fit", contentFont.className)}
         >
             <motion.div 
                 initial={{opacity:0, y:500}}
                 animate ={{opacity:1, y:0}}
                 transition={{duration:0.2,ease:"easeInOut"}}
                 exit={{opacity:0, y:500}}
-                className={cn("lg:w-[30vw] w-full h-[50vh] lg:h-[60vh] backdrop-blur-xl p-10 pt-20 rounded-2xl z-[99999] relative overflow-y-auto", mode === 'dark' ? 'bg-neutral-300/80 text-neutral-900' : 'bg-neutral-700/80 text-neutral-100')}
+                className={cn("lg:w-[30vw] w-full h-[50vh] lg:h-[60vh] backdrop-blur-xl p-10 rounded-2xl z-[99999] relative overflow-y-auto", mode === 'dark' ? 'bg-neutral-300/80 text-neutral-900' : 'bg-neutral-700/80 text-neutral-100')}
             >
-                <div role="button" className="fixed top-5 left-5" onClick={() => stateFunction(!state)}>
+                <div role="button" className={cn("fixed top-5 right-5", mode === 'dark' ? 'text-red-700' : 'text-red-400')} onClick={() => stateFunction(!state)}>
                     <CircleX size={30} />
                 </div>
                 <div className="">
                     <p className={cn("text-5xl font-semibold", headingFont.className)}>
                         {markerData.title}
                     </p>
-                    <p className="pt-2 text-sm">
+                    <p className="pt-10 text-sm">
                         Address : {markerData.address.label} ({markerData.position.lat}, {markerData.position.lng})
                     </p>
-                    <p className="text-sm">
+                    {/* <p className="text-sm">
                         Category : {markerData.categories[0].name}
-                    </p>
+                    </p> */}
                     <p className="text-lg pt-10">
                         Madame Tussauds India is a wax museum and tourist attraction It is the twenty-second location for the Tussauds, which was set up by French sculptor Marie Tussaud. Madame Tussauds is owned and operated by Merlin Entertainments. Now it has been shifted to Noida in July 2022.
                     </p>
