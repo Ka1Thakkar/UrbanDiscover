@@ -72,12 +72,12 @@ const Map = ({ coordinates, layer, mode }: MapProps) => {
                 className="w-[100vw] h-[100vh]"
                 >
                 {layer === 'HERE' && mode === 'light' &&(<TileLayer
-                    url="https://2.base.maps.ls.hereapi.com/maptile/2.1/maptile/newest/normal.day/{z}/{x}/{y}/512/png8?apiKey=I8lpkuRyJfxK5An9NzPrFalvL_9Nyjh5Qx76yN9xRQs&ppi=320"
+                    url={"https://2.base.maps.ls.hereapi.com/maptile/2.1/maptile/newest/normal.day/{z}/{x}/{y}/512/png8?apiKey=" + process.env.MAP_API +"&ppi=320"}
                     // attribution="&copy; <a>HERE Maps</a> contributors" 
                     className=" grayscale"
                     />)}
                 {layer === 'HERE' && mode === 'dark' &&(<TileLayer
-                    url="https://2.base.maps.ls.hereapi.com/maptile/2.1/maptile/newest/reduced.night/{z}/{x}/{y}/512/png8?apiKey=I8lpkuRyJfxK5An9NzPrFalvL_9Nyjh5Qx76yN9xRQs&ppi=320"
+                    url={"https://2.base.maps.ls.hereapi.com/maptile/2.1/maptile/newest/reduced.night/{z}/{x}/{y}/512/png8?apiKey=" + process.env.MAP_API + "&ppi=320"}
                     // attribution="&copy; <a>HERE Maps</a> contributors" 
                     className=" grayscale contrast-200"
                     />)}

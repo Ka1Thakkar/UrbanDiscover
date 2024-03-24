@@ -46,7 +46,7 @@ export default function Home() {
       if (e.key === 'Enter') {
         const place = (document.getElementById('input') as HTMLInputElement)?.value.toString();
 
-        const res = await fetch(`https://geocode.search.hereapi.com/v1/geocode?q=` + place + `&apiKey=oJawmOVpYcJE0LK4Gr1nHMJjZDVPgS5CJ7i-ThpuxKA`);
+        const res = await fetch(`https://geocode.search.hereapi.com/v1/geocode?q=` + place + `&apiKey=` + process.env.LOCATION_API);
         const data = await res.json();
         const lat = await data.items[0].position.lat;
         const lng = await data.items[0].position.lng;
@@ -63,7 +63,7 @@ export default function Home() {
 
   useEffect(() => {
     const getSuggestions = (async () => {
-      const res = await fetch(`https://autosuggest.search.hereapi.com/v1/autosuggest?at=` + coordinates[0] + `,` + coordinates[1] + `&limit=5&lang=en&q=` + value + `&apiKey=oJawmOVpYcJE0LK4Gr1nHMJjZDVPgS5CJ7i-ThpuxKA`)
+      const res = await fetch(`https://autosuggest.search.hereapi.com/v1/autosuggest?at=` + coordinates[0] + `,` + coordinates[1] + `&limit=5&lang=en&q=` + value + `&apiKey=` + process.env.LOCATION_API)
       const data = await res.json();
       const filteredData = data.items.filter((item: any) => item.resultType === "administrativeArea" || item.resultType === 'locality');
       setSuggestData(filteredData)
