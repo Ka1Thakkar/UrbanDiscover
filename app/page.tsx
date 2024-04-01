@@ -6,6 +6,7 @@ import { DM_Sans, Roboto, Roboto_Condensed } from "next/font/google";
 import dynamic from "next/dynamic";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import MapComponent from "@/components/new_map";
 
 const Map = dynamic(() => import('@/components/map'), { ssr: false });
 
@@ -150,7 +151,9 @@ export default function Home() {
           })}
         </div>
       </div>
-      <Map coordinates={coordinates} layer={layerType} mode={layerMode}/>
+      {/* <Map coordinates={coordinates} layer={layerType} mode={layerMode}/>
+       */}
+       <MapComponent/>
     </main>
   );
 }
