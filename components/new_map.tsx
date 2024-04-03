@@ -8,7 +8,7 @@ const MapComponent: React.FC = () => {
     };
 
     const script = document.createElement('script');
-    script.src = 'https://apis.mappls.com/advancedmaps/api/c91e238a-6430-4f4e-929c-5d8598d0b3d7/map_sdk?layer=vector&v=3.0&callback=initMap';
+    script.src = `https://apis.mappls.com/advancedmaps/api/3d566c77-3b9d-47ca-9fbf-e983bd2601eb/map_sdk?layer=vector&v=3.0&callback=initMap`;
     script.async = true;
     script.defer = true;
     document.head.appendChild(script);

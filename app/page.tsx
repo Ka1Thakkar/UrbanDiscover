@@ -19,8 +19,8 @@ export default function Home() {
   const [Data, setData] = useState<any>([])
   const [value, setValue] = useState<any>([])
   const [suggestData, setSuggestData] = useState<any>([]);
-  const [layerType, setLayerType] = useState<any>('OpenStreetMap')
-  const [layerMode, setLayerMode] = useState<any>('dark')
+  const [layerType, setLayerType] = useState<any>('mappls')
+  const [layerMode, setLayerMode] = useState<any>('light')
 
   useLayoutEffect(() => {
     const options = {
@@ -116,7 +116,7 @@ export default function Home() {
                     OpenStreetMap Dark
                   </button>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                {/* <DropdownMenuItem>
                   <button onClick={() => onLayerClick('HERE', 'light')}>
                     HERE Maps Light
                   </button>
@@ -124,6 +124,11 @@ export default function Home() {
                 <DropdownMenuItem>
                   <button onClick={() => onLayerClick('HERE', 'dark')}>
                     HERE Maps Dark
+                  </button>
+                </DropdownMenuItem> */}
+                <DropdownMenuItem>
+                  <button onClick={() => onLayerClick('mappls', 'light')}>
+                    Mappls Map
                   </button>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -153,7 +158,7 @@ export default function Home() {
       </div>
       {/* <Map coordinates={coordinates} layer={layerType} mode={layerMode}/>
        */}
-       <MapComponent/>
+       {layerType === 'mappls' ? <MapComponent/> : <Map coordinates={coordinates} layer={layerType} mode={layerMode} /> }
     </main>
   );
 }
